@@ -30,6 +30,34 @@ public class DataSiswa extends javax.swing.JFrame {
         showData();
     }
     
+    DefaultTableModel dtm;
+    public void showData(){
+        
+        String[] kolom = {"NO","NIS","Nama","Kelas","Jurusan"};
+        
+        dtm = new DefaultTableModel(null, kolom);
+        try {
+            Statement stat = koneksi.createStatement();
+            String query = "SELECT * FROM t_siswa";
+            ResultSet rs = stat.executeQuery(query);
+            int no = 1;
+            while (rs.next()){
+                String nis = rs.getString("nis");
+                String nama = rs.getString("nama");
+                String kelas = rs.getString("kelas");
+                String jurusan = rs.getString("jurusan");                
+
+                dtm.addRow(new String[]{no+"",nis,nama,kelas,jurusan});
+                no++;}
+            }
+        catch(SQLException ex){
+            ex.printStackTrace();
+        }
+        t_siswa.setModel(dtm);
+    }
+
+    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -157,24 +185,83 @@ public class DataSiswa extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
      private void cmdTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTambahActionPerformed
-
+        // TODO add your handling code here:
+        ManageData tambahData = new ManageData(this, true, "Tambah","");
+        tambahData.setVisible(true);
     }//GEN-LAST:event_cmdTambahActionPerformed
-
+    
+      int baris;
     private void t_siswaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_t_siswaMouseClicked
-
+        // TODO add your handling code here:
+        baris = t_siswa.getSelectedRow();
     }//GEN-LAST:event_t_siswaMouseClicked
     
      private void cmdHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdHapusActionPerformed
-
+        // TODO add your handling code here:
+        String thoseWhoWantsToBeDeleted = t_siswa.getValueAt(baris, 1).toString();
+        try {
+            Statement stmt = koneksi.createStatement();
+            String query = "DELETE FROM t_siswa WHERE nis = '"+thoseWhoWantsToBeDeleted+"'";
+            System.out.println(query);
+            int berhasil = stmt.executeUpdate(query);
+            if(berhasil == 1){
+                JOptionPane.showMessageDialog(null, "Data Berhasil Dihapus");
+                dtm.getDataVector().removeAllElements();
+                showData();
+            }else{
+                JOptionPane.showMessageDialog(null,"Data berhasil dihapus");
+            }
+        }catch(SQLException ex){
+            ex.printStackTrace();
+        }
     }//GEN-LAST:event_cmdHapusActionPerformed
     
       private void cmdUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdUbahActionPerformed
-
+        // TODO add your handling code here:
+        String nis = t_siswa.getValueAt(baris,1).toString();
+        ManageData tambahData = new ManageData(this,true, "Edit", nis);
+        tambahData.setVisible(true);
     }//GEN-LAST:event_cmdUbahActionPerformed
 
     private void cmdRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRefreshActionPerformed
-
+        // TODO add your handling code here:
+        showData();
     }//GEN-LAST:event_cmdRefreshActionPerformed
+     
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(DataSiswa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(DataSiswa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(DataSiswa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(DataSiswa.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new DataSiswa().setVisible(true);
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdHapus;
@@ -188,3 +275,6 @@ public class DataSiswa extends javax.swing.JFrame {
     private javax.swing.JTable t_siswa;
     // End of variables declaration//GEN-END:variables
 
+
+    
+}
